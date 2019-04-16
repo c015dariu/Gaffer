@@ -29,7 +29,7 @@
     </module>
 
     <module name="RegexpHeader">
-        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="headerFile" value="${checkstyle.metaData.file}"/>
     </module>
 
     <module name="RegexpSingleline">

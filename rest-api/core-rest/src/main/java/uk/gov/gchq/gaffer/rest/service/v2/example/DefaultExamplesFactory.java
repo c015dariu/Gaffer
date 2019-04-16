@@ -29,6 +29,7 @@ import uk.gov.gchq.gaffer.data.generator.MapGenerator;
 import uk.gov.gchq.gaffer.named.view.AddNamedView;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
 import uk.gov.gchq.gaffer.operation.data.EdgeSeed;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
 import uk.gov.gchq.gaffer.operation.impl.GetWalks;
@@ -58,7 +59,6 @@ import uk.gov.gchq.koryphe.impl.predicate.IsLongerThan;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,6 +105,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         map.put(AddNamedView.class, addNamedView());
         map.put(If.class, ifOperation());
         map.put(While.class, whileOperation());
+        map.put(AddAnalyticOperation.class, AddAnalyticOperation());
 
         examplesMap = map;
     }
@@ -351,6 +352,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         return op;
     }
 
+
     @Override
     public AddElements addElements() {
         final AddElements op = new AddElements();
@@ -475,6 +477,30 @@ public class DefaultExamplesFactory implements ExamplesFactory {
                                 .build())
                         .build())
                 .resultsLimit(10000)
+                .build();
+    }
+
+    @Override
+    public AddAnalyticOperation AddAnalyticOperation() {
+        String USER = "User";
+        OperationChain OPERATION_CHAIN = new OperationChain.Builder().first(new GetAdjacentIds.Builder().input(new EntitySeed("seed")).build()).build();
+
+        Map<String, String> metaData = new HashMap<>();
+        metaData.put("iconURL", "example.png");
+
+        Map<String, String> outputType = new HashMap<>();
+        outputType.put("output", "table");
+
+        return new AddAnalyticOperation.Builder()
+                .operation(OPERATION_CHAIN)
+                .description("Adds an Example Analytic Operation")
+                .name("Example Analytic Operation")
+                .overwrite(false)
+                .readAccessRoles(USER)
+                .writeAccessRoles(USER)
+                .metaData(metaData)
+                .outputType(outputType)
+                .score(2)
                 .build();
     }
 

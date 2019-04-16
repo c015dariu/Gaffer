@@ -1,4 +1,4 @@
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{
+curl -X POST --metaData 'Content-Type: application/json' --metaData 'Accept: application/json' -d '{
     "class" : "uk.gov.gchq.gaffer.operation.impl.add.AddElements",
     "input" : [ {
      "group" : "BasicEntity",

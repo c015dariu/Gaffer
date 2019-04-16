@@ -45,6 +45,10 @@ import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationChainDAO;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.Operations;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
 import uk.gov.gchq.gaffer.operation.impl.Count;
 import uk.gov.gchq.gaffer.operation.impl.CountGroups;
 import uk.gov.gchq.gaffer.operation.impl.DiscardOutput;
@@ -124,6 +128,10 @@ import uk.gov.gchq.gaffer.store.operation.handler.SetVariableHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.ValidateHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.ValidateOperationChainHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.WhileHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.AddAnalyticOperationHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.AnalyticOperationHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.DeleteAnalyticOperationHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.GetAllAnalyticOperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.compare.MaxHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.compare.MinHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.compare.SortHandler;
@@ -940,6 +948,12 @@ public abstract class Store {
             addOperationHandler(AddNamedView.class, new AddNamedViewHandler());
             addOperationHandler(GetAllNamedViews.class, new GetAllNamedViewsHandler());
             addOperationHandler(DeleteNamedView.class, new DeleteNamedViewHandler());
+
+            // Analytics
+            addOperationHandler(AnalyticOperation.class, new AnalyticOperationHandler());
+            addOperationHandler(AddAnalyticOperation.class, new AddAnalyticOperationHandler());
+            addOperationHandler(GetAllAnalyticOperations.class, new GetAllAnalyticOperationHandler());
+            addOperationHandler(DeleteAnalyticOperation.class, new DeleteAnalyticOperationHandler());
         }
 
         // ElementComparison
