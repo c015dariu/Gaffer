@@ -17,9 +17,13 @@
 package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
 
+import com.google.common.collect.Maps;
+
 import uk.gov.gchq.gaffer.commonutil.iterable.CloseableIterable;
 import uk.gov.gchq.gaffer.commonutil.iterable.WrappedCloseableIterable;
 import uk.gov.gchq.gaffer.named.operation.NamedOperation;
+import uk.gov.gchq.gaffer.named.operation.NamedOperationDetail;
+import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.Operations;
@@ -31,8 +35,10 @@ import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OutputOperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.store.operation.handler.named.cache.NamedOperationCache;
 import uk.gov.gchq.koryphe.util.IterableUtil;
 
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -40,6 +46,7 @@ import java.util.function.Function;
  */
 public class GetAllAnalyticOperationHandler implements OutputOperationHandler<GetAllAnalyticOperations, CloseableIterable<AnalyticOperationDetail>> {
     private final AnalyticOperationCache cache;
+    private static Context context;
 
     public GetAllAnalyticOperationHandler() {
         this(new AnalyticOperationCache());
@@ -62,6 +69,7 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
      */
     @Override
     public CloseableIterable<AnalyticOperationDetail> doOperation(final GetAllAnalyticOperations operation, final Context context, final Store store) throws OperationException {
+        GetAllAnalyticOperationHandler.context = context;
         final CloseableIterable<AnalyticOperationDetail> ops = cache.getAllAnalyticOperations(context.getUser(), store.getProperties().getAdminAuth());
         return new WrappedCloseableIterable<>(IterableUtil.map(ops, new AddInputType()));
     }
@@ -95,7 +103,14 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
                 try {
                     final Operation op = analyticOp.getOperationWithDefaultParams();
                     if (op instanceof NamedOperation) {
-                        analyticOp.setParameters(((NamedOperation) op).getParameters());
+                        Map<String, Object> nop = ((NamedOperation) op).getParameters();
+                        NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(((NamedOperation) op).getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
+                        Map<String, ParameterDetail> params = Maps.newHashMap();
+                        for (String currentParam : nod.getParameters().keySet()) {
+                            if (nop.keySet().contains(currentParam))
+                                params.put(currentParam, nod.getParameters().get(currentParam));
+                        }
+                        analyticOp.setParameters(params);
                     }
                 } catch (final Exception e) {
                     // ignore - no need to map parameters

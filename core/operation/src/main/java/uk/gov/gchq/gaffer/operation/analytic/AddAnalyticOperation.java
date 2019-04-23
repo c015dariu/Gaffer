@@ -48,7 +48,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-@JsonPropertyOrder(value = {"class", "operationName", "description", "score", "operations", "metaData"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "operationName", "description", "score", "operation"}, alphabetic = true)
 @Since("1.0.0")
 @Summary("Adds a new analytic")
 public class AddAnalyticOperation implements Operation, Operations<Operation> {

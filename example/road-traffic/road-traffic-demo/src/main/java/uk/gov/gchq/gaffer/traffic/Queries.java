@@ -41,6 +41,7 @@ import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
 import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
 import uk.gov.gchq.gaffer.operation.graph.SeededGraphFilters;
@@ -272,7 +273,7 @@ public class Queries {
 
         graph.execute(addFullExampleNamedOperation, user);
         final Map<String, Object> paramMap = Maps.newHashMap();
-        paramMap.put("result-limit", 5);
+        paramMap.put("vehicle", "BUS");
         final Map<String, Object> paramMap2 = Maps.newHashMap();
         paramMap2.put("result-limit", 2);
         final Map<String, String> metaData = Maps.newHashMap();
@@ -293,11 +294,7 @@ public class Queries {
 
         final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
                 .name("analyticTest")
-                .operation("{\n" +
-                        "   \"class\": \"uk.gov.gchq.gaffer.named.operation.NamedOperation\",\n" +
-                        "   \"operationName\": \"frequent-vehicles-in-region\",\n" +
-                        "   \"parameters\": { \"result-limit\": 5 }\n" +
-                        "}")
+                .operation(runExampleNamedOperation)
                 .overwrite()
                 .metaData(metaData)
                 .outputType(outputMap)
@@ -316,15 +313,13 @@ public class Queries {
                 .then(runAnalyticOperation)
                 .build();
 
-        Iterable<? extends String> results = (Iterable<? extends String>) graph.execute(operationChain, user);
+        CloseableIterable<? extends AnalyticOperationDetail> results = graph.execute(getAna, user);
 
         try {
             System.out.println(new String(JSONSerialiser.serialise(results, true)));
         } catch (SerialisationException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private Graph createGraph(final User user) throws IOException, OperationException {

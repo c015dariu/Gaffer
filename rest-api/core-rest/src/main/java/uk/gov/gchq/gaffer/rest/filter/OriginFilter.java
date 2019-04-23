@@ -23,14 +23,16 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Servlet filter to enforce some additional headers on HTTP responses from the
  * Gaffer REST API.
  */
 public class OriginFilter implements Filter {
+    private static final Logger log = Logger.getAnonymousLogger();
+
     @Override
     public void doFilter(final ServletRequest request,
                          final ServletResponse response,
@@ -40,6 +42,10 @@ public class OriginFilter implements Filter {
         httpResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
         httpResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
         chain.doFilter(request, httpResponse);
+        log.info("STUFF IS HAPPENING");
+        for (String header : httpResponse.getHeaderNames()) {
+            log.info(header);
+        }
     }
 
     @Override
