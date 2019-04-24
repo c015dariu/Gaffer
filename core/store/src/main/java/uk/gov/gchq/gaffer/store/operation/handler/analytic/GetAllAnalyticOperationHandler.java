@@ -96,6 +96,12 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
                     final Operation op = analyticOp.getOperationWithDefaultParams();
                     if (op instanceof NamedOperation) {
                         analyticOp.setParameters(((NamedOperation) op).getParameters());
+                    } else {
+                        for (Object current : ((Operations) op).getOperations()) {
+                            if (current instanceof NamedOperation) {
+                                analyticOp.setParameters(((NamedOperation) current).getParameters());
+                            }
+                        }
                     }
                 } catch (final Exception e) {
                     // ignore - no need to map parameters
