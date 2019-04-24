@@ -112,6 +112,20 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
                         }
                         analyticOp.setParameters(params);
                     }
+                    else if (op instanceof Operations) {
+                        for (Object current : ((Operations) op).getOperations()) {
+                            if (current instanceof NamedOperation) {
+                                Map<String, Object> nop = ((NamedOperation) current).getParameters();
+                                NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(((NamedOperation) current).getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
+                                Map<String, ParameterDetail> params = Maps.newHashMap();
+                                for (String currentParam : nod.getParameters().keySet()) {
+                                    if (nop.keySet().contains(currentParam))
+                                        params.put(currentParam, nod.getParameters().get(currentParam));
+                                }
+                                analyticOp.setParameters(params);
+                            }
+                        }
+                    }
                 } catch (final Exception e) {
                     // ignore - no need to map parameters
                 }
