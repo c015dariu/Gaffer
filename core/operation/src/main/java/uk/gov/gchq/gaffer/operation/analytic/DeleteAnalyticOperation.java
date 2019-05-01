@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * A {@code DeleteAnalyticOperation} is an {@link Operation} for removing an existing
- * {@link AnalyticOperation} from a Gaffer graph.
+ * {@link AnalyticOperationDetail} from a Gaffer graph.
  */
 @JsonPropertyOrder(value = {"class", "operationName"}, alphabetic = true)
 @Since("1.0.0")

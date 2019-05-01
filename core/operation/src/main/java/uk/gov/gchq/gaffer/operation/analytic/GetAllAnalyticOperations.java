@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * A {@link GetAllAnalyticOperations} is an {@link uk.gov.gchq.gaffer.operation.Operation}
- * for retrieving all {@link AnalyticOperation}s associated with a Gaffer graph.
+ * for retrieving all {@link AnalyticOperationDetail}s associated with a Gaffer graph.
  */
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
 @Since("1.0.0")
