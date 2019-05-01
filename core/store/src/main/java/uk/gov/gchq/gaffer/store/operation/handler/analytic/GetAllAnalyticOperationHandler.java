@@ -17,29 +17,15 @@
 package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
 
-import com.google.common.collect.Maps;
-
 import uk.gov.gchq.gaffer.commonutil.iterable.CloseableIterable;
 import uk.gov.gchq.gaffer.commonutil.iterable.WrappedCloseableIterable;
-import uk.gov.gchq.gaffer.named.operation.NamedOperation;
-import uk.gov.gchq.gaffer.named.operation.NamedOperationDetail;
-import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
-import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.Operations;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
 import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
-import uk.gov.gchq.gaffer.operation.io.Input;
-import uk.gov.gchq.gaffer.serialisation.util.JsonSerialisationUtil;
 import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OutputOperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
-import uk.gov.gchq.gaffer.store.operation.handler.named.cache.NamedOperationCache;
-import uk.gov.gchq.koryphe.util.IterableUtil;
-
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Operation Handler for GetAllAnalyticOperations
@@ -71,66 +57,6 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
     public CloseableIterable<AnalyticOperationDetail> doOperation(final GetAllAnalyticOperations operation, final Context context, final Store store) throws OperationException {
         GetAllAnalyticOperationHandler.context = context;
         final CloseableIterable<AnalyticOperationDetail> ops = cache.getAllAnalyticOperations(context.getUser(), store.getProperties().getAdminAuth());
-        return new WrappedCloseableIterable<>(IterableUtil.map(ops, new AddInputType()));
-    }
-
-    private static class AddInputType implements Function<AnalyticOperationDetail, AnalyticOperationDetail> {
-
-        @Override
-        public AnalyticOperationDetail apply(final AnalyticOperationDetail analyticOp) {
-            return resolveParameters(addInput(analyticOp));
-        }
-
-        private AnalyticOperationDetail addInput(final AnalyticOperationDetail analyticOp) {
-            if (null != analyticOp && null == analyticOp.getInputType()) {
-                try {
-                    final Operation op = analyticOp.getOperationWithDefaultParams();
-                    if (op instanceof Operations) {
-                        final Operation firstOp = (Operation) ((Operations) op).getOperations().toArray()[0];
-                        if (firstOp instanceof Input) {
-                            analyticOp.setInputType(JsonSerialisationUtil.getSerialisedFieldClasses(firstOp.getClass().getName()).get("input"));
-                        }
-                    }
-                } catch (final Exception e) {
-                    // ignore - just don't add the input type
-                }
-            }
-            return analyticOp;
-        }
-
-        private AnalyticOperationDetail resolveParameters(final AnalyticOperationDetail analyticOp) {
-            if (null != analyticOp && analyticOp.getOperations() != null) {
-                try {
-                    final Operation op = analyticOp.getOperationWithDefaultParams();
-                    if (op instanceof NamedOperation) {
-                        Map<String, Object> nop = ((NamedOperation) op).getParameters();
-                        NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(((NamedOperation) op).getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
-                        Map<String, ParameterDetail> params = Maps.newHashMap();
-                        for (String currentParam : nod.getParameters().keySet()) {
-                            if (nop.keySet().contains(currentParam))
-                                params.put(currentParam, nod.getParameters().get(currentParam));
-                        }
-                        analyticOp.setParameters(params);
-                    }
-                    else if (op instanceof Operations) {
-                        for (Object current : ((Operations) op).getOperations()) {
-                            if (current instanceof NamedOperation) {
-                                Map<String, Object> nop = ((NamedOperation) current).getParameters();
-                                NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(((NamedOperation) current).getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
-                                Map<String, ParameterDetail> params = Maps.newHashMap();
-                                for (String currentParam : nod.getParameters().keySet()) {
-                                    if (nop.keySet().contains(currentParam))
-                                        params.put(currentParam, nod.getParameters().get(currentParam));
-                                }
-                                analyticOp.setParameters(params);
-                            }
-                        }
-                    }
-                } catch (final Exception e) {
-                    // ignore - no need to map parameters
-                }
-            }
-            return analyticOp;
-        }
+        return new WrappedCloseableIterable<>(ops);
     }
 }

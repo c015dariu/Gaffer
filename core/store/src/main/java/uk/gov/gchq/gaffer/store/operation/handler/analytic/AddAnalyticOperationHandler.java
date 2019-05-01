@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
-import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
 import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationException;
@@ -26,8 +25,6 @@ import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
-
-import java.util.Map;
 
 public class AddAnalyticOperationHandler implements OperationHandler<AddAnalyticOperation> {
     private final AnalyticOperationCache cache;
@@ -56,20 +53,20 @@ public class AddAnalyticOperationHandler implements OperationHandler<AddAnalytic
     public Void doOperation(final AddAnalyticOperation operation, final Context context, final Store store) throws OperationException {
         try {
             final AnalyticOperationDetail analyticOperationDetail = new AnalyticOperationDetail.Builder()
-                    .operation(operation.getOperationAsString())
+                    .analyticName(operation.getAnalyticName())
                     .operationName(operation.getOperationName())
                     .creatorId(context.getUser().getUserId())
                     .readers(operation.getReadAccessRoles())
                     .writers(operation.getWriteAccessRoles())
                     .description(operation.getDescription())
-                    .parameters(operation.getParameters())
+                    .uiMapping(operation.getUiMapping())
                     .metaData(operation.getMetaData())
                     .outputType(operation.getOutputType())
                     .score(operation.getScore())
                     .options(operation.getOptions())
                     .build();
 
-            validate(analyticOperationDetail.getOperationWithDefaultParams(), analyticOperationDetail);
+            validate(analyticOperationDetail);
 
             cache.addAnalyticOperation(analyticOperationDetail, operation.isOverwriteFlag(), context
                     .getUser(), store.getProperties().getAdminAuth());
@@ -79,16 +76,10 @@ public class AddAnalyticOperationHandler implements OperationHandler<AddAnalytic
         return null;
     }
 
-    private void validate(final Operation operation, final AnalyticOperationDetail analyticOperationDetail) throws OperationException {
+    private void validate(final AnalyticOperationDetail analyticOperationDetail) throws OperationException {
 
-        if (null != analyticOperationDetail.getParameters()) {
-            String operationString = analyticOperationDetail.getOperations();
-            for (final Map.Entry<String, ParameterDetail> parameterDetail : analyticOperationDetail.getParameters().entrySet()) {
-                String varName = "${" + parameterDetail.getKey() + "}";
-                if (!operationString.contains(varName)) {
-                    throw new OperationException("Parameter specified in AnalyticOperation doesn't occur in Operation string for " + varName);
-                }
-            }
+        if (null != analyticOperationDetail.getUiMapping()) {
+            // UiMapping Validation goes here.
         }
 
         if (null == analyticOperationDetail.getOutputType()) {

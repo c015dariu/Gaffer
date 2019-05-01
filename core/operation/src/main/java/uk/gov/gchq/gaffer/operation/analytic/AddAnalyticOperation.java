@@ -100,11 +100,11 @@ public class AddAnalyticOperation implements Operation {
         this.description = description;
     }
 
-    public void setParameters(final Map<String, UIMappingDetail> uiMapping) {
+    public void setUiMapping(final Map<String, UIMappingDetail> uiMapping) {
         this.uiMapping = uiMapping;
     }
 
-    public Map<String, UIMappingDetail> getParameters() {
+    public Map<String, UIMappingDetail> getUiMapping() {
         return uiMapping;
     }
 
@@ -192,15 +192,15 @@ public class AddAnalyticOperation implements Operation {
         }
 
         public AddAnalyticOperation.Builder uiMapping(final Map<String, UIMappingDetail> uiMapping) {
-            _getOp().setParameters(uiMapping);
+            _getOp().setUiMapping(uiMapping);
             return _self();
         }
 
         public AddAnalyticOperation.Builder uiMapping(final String name, final UIMappingDetail detail) {
-            Map<String, UIMappingDetail> uiMapping = _getOp().getParameters();
+            Map<String, UIMappingDetail> uiMapping = _getOp().getUiMapping();
             if (isNull(uiMapping)) {
                 uiMapping = new HashMap<>();
-                _getOp().setParameters(uiMapping);
+                _getOp().setUiMapping(uiMapping);
             }
             uiMapping.put(name, detail);
             return _self();
