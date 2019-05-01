@@ -130,7 +130,7 @@ public class AddAnalyticOperation implements Operation {
     public AddAnalyticOperation shallowClone() {
         return new AddAnalyticOperation.Builder()
                 .analyticName(analyticName)
-                .name(operationName)
+                .operationName(operationName)
                 .description(description)
                 .readAccessRoles(readAccessRoles.toArray(new String[readAccessRoles.size()]))
                 .writeAccessRoles(writeAccessRoles.toArray(new String[writeAccessRoles.size()]))
@@ -171,7 +171,7 @@ public class AddAnalyticOperation implements Operation {
             return _self();
         }
 
-        public AddAnalyticOperation.Builder name(final String name) {
+        public AddAnalyticOperation.Builder operationName(final String name) {
             _getOp().setOperationName(name);
             return _self();
         }
