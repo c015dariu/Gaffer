@@ -16,41 +16,27 @@
 
 package uk.gov.gchq.gaffer.operation.analytic;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.gaffer.commonutil.CommonConstants;
 import uk.gov.gchq.gaffer.commonutil.ToStringBuilder;
-import uk.gov.gchq.gaffer.exception.SerialisationException;
-import uk.gov.gchq.gaffer.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.gaffer.named.operation.NamedOperation;
-import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
-import uk.gov.gchq.gaffer.operation.Operation;
-import uk.gov.gchq.gaffer.operation.OperationChain;
-import uk.gov.gchq.gaffer.operation.OperationChainDAO;
 import uk.gov.gchq.gaffer.user.User;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class AnalyticOperationDetail implements Serializable {
 
-    private static final String CHARSET_NAME = CommonConstants.UTF_8;
+    private String analyticName;
     private String operationName;
-    private String inputType;
     private String description;
     private String creatorId;
-    private String operations;
     private List<String> readAccessRoles;
     private List<String> writeAccessRoles;
-    private Map<String, ParameterDetail> parameters = Maps.newHashMap();
+    private Map<String, UIMappingDetail> uiMapping = Maps.newHashMap();
     private Map<String, String> options = Maps.newHashMap();
     private Map<String, String> metaData = Maps.newHashMap();
     private Map<String, String> outputType = Maps.newHashMap();
@@ -59,58 +45,40 @@ public class AnalyticOperationDetail implements Serializable {
     public AnalyticOperationDetail() {
     }
 
-    public AnalyticOperationDetail(final String operationName, final String description, final String userId,
-                                   final String operations, final List<String> readers,
-                                   final List<String> writers, final Map<String, ParameterDetail> parameters,
-                                   final Integer score, final Map<String, String> options, final Map<String, String> metaData,
-                                   final Map<String, String> outputType) {
-        this(operationName, null, description, userId, operations, readers, writers, parameters, metaData, outputType, score, options);
-    }
+    public AnalyticOperationDetail(final String analyticName, final String operationName, final String description,
+                                   final String userId, final List<String> readers,
+                                   final List<String> writers, final Map<String, UIMappingDetail> uiMapping,
+                                   final Map<String, String> metaData, final Map<String, String> outputType,
+                                   final Integer score, final Map<String, String> options) {
 
-    public AnalyticOperationDetail(final String operationName, final String inputType, final String description, final String userId,
-                                   final String operations, final List<String> readers,
-                                   final List<String> writers, final Map<String, ParameterDetail> parameters,
-                                   final Map<String, String> metaData, final Map<String, String> outputType, final Integer score, final Map<String, String> options) {
-        if (null == operations) {
-            throw new IllegalArgumentException("Operation Chain must not be empty");
-        }
         if (null == operationName || operationName.isEmpty()) {
             throw new IllegalArgumentException("Operation Name must not be empty");
         }
 
+        this.analyticName = analyticName;
         this.operationName = operationName;
-        this.inputType = inputType;
         this.description = description;
         this.creatorId = userId;
-        this.operations = operations;
 
         this.readAccessRoles = readers;
         this.writeAccessRoles = writers;
-        this.parameters = parameters;
+        this.uiMapping = uiMapping;
         this.metaData = metaData;
         this.outputType = outputType;
         this.score = score;
         this.options = options;
     }
 
+    public String getAnalyticName() {
+        return analyticName;
+    }
+
     public String getOperationName() {
         return operationName;
     }
 
-    public String getInputType() {
-        return inputType;
-    }
-
-    public void setInputType(final String inputType) {
-        this.inputType = inputType;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public String getOperations() {
-        return operations;
     }
 
     public List<String> getReadAccessRoles() {
@@ -125,12 +93,12 @@ public class AnalyticOperationDetail implements Serializable {
         return creatorId;
     }
 
-    public Map<String, ParameterDetail> getParameters() {
-        return parameters;
+    public Map<String, UIMappingDetail> getUiMapping() {
+        return uiMapping;
     }
 
-    public void setParameters(Map<String, ParameterDetail> parameters) {
-        this.parameters = parameters;
+    public void setUiMapping(Map<String, UIMappingDetail> parameters) {
+        this.uiMapping = parameters;
     }
 
     public Integer getScore() {
@@ -149,104 +117,6 @@ public class AnalyticOperationDetail implements Serializable {
         return outputType;
     }
 
-    private String buildParamNameString(final String paramKey) {
-        return "\"${" + paramKey + "}\"";
-    }
-
-    /**
-     * Gets the OperationChain after adding in default values for any parameters. If a parameter
-     * does not have a default, null is inserted.
-     *
-     * @return The {@link OperationChain}
-     * @throws IllegalArgumentException if substituting the parameters fails
-     */
-    @JsonIgnore
-    public Operation getOperationWithDefaultParams() {
-        String opStringWithDefaults = operations;
-
-        if (null != parameters) {
-            for (final Map.Entry<String, ParameterDetail> parameterDetailPair : parameters.entrySet()) {
-                String paramKey = parameterDetailPair.getKey();
-
-                try {
-                    opStringWithDefaults = opStringWithDefaults.replace(buildParamNameString(paramKey),
-                            new String(JSONSerialiser.serialise(parameterDetailPair.getValue().getDefaultValue(), CHARSET_NAME), CHARSET_NAME));
-                } catch (final SerialisationException | UnsupportedEncodingException e) {
-                    throw new IllegalArgumentException(e.getMessage());
-                }
-            }
-        }
-
-        Operation opChain;
-        try {
-            opChain = JSONSerialiser.deserialise(opStringWithDefaults.getBytes(CHARSET_NAME), OperationChainDAO.class);
-        } catch (final Exception e) {
-            try {
-                opChain = JSONSerialiser.deserialise(opStringWithDefaults.getBytes(CHARSET_NAME), NamedOperation.class);
-            } catch (final Exception f) {
-                throw new IllegalArgumentException(e.getMessage());
-            }
-        }
-
-        return opChain;
-    }
-
-    /**
-     * Gets the OperationChain after adding in any provided parameters.
-     *
-     * @param executionParams the parameters for the {@link uk.gov.gchq.gaffer.operation.Operation} to be executed
-     * @return The {@link OperationChain}
-     * @throws IllegalArgumentException if substituting the parameters fails
-     */
-    public Operation getOperation(final Map<String, Object> executionParams) {
-        String opStringWithParams = operations;
-
-        // First check all the parameters supplied are expected parameter names
-        if (null != parameters) {
-            if (null != executionParams) {
-                Set<String> paramDetailKeys = parameters.keySet();
-                Set<String> paramKeys = executionParams.keySet();
-
-                if (!paramDetailKeys.containsAll(paramKeys)) {
-                    throw new IllegalArgumentException("Unexpected parameter name in AnalyticOperation");
-                }
-            }
-
-            for (final Map.Entry<String, ParameterDetail> parameterDetailPair : parameters.entrySet()) {
-                String paramKey = parameterDetailPair.getKey();
-                try {
-                    if (null != executionParams && executionParams.containsKey(paramKey)) {
-                        Object paramObj = JSONSerialiser.deserialise(JSONSerialiser.serialise(executionParams.get(paramKey)), parameterDetailPair.getValue().getValueClass());
-
-                        opStringWithParams = opStringWithParams.replace(buildParamNameString(paramKey),
-                                new String(JSONSerialiser.serialise(paramObj, CHARSET_NAME), CHARSET_NAME));
-                    } else if (!parameterDetailPair.getValue().isRequired()) {
-                        opStringWithParams = opStringWithParams.replace(buildParamNameString(paramKey),
-                                new String(JSONSerialiser.serialise(parameterDetailPair.getValue().getDefaultValue(), CHARSET_NAME), CHARSET_NAME));
-                    } else {
-                        throw new IllegalArgumentException("Missing parameter " + paramKey + " with no default");
-                    }
-                } catch (final SerialisationException | UnsupportedEncodingException e) {
-                    throw new IllegalArgumentException(e.getMessage());
-                }
-            }
-        }
-
-        Operation opChain;
-
-        try {
-            opChain = JSONSerialiser.deserialise(opStringWithParams.getBytes(CHARSET_NAME), OperationChainDAO.class);
-        } catch (final Exception e) {
-            try {
-                opChain = JSONSerialiser.deserialise(opStringWithParams.getBytes(CHARSET_NAME), NamedOperation.class);
-            } catch (final Exception f) {
-                throw new IllegalArgumentException(e.getMessage());
-            }
-        }
-
-        return opChain;
-    }
-
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -260,13 +130,12 @@ public class AnalyticOperationDetail implements Serializable {
         final AnalyticOperationDetail op = (AnalyticOperationDetail) obj;
 
         return new EqualsBuilder()
+                .append(analyticName, op.analyticName)
                 .append(operationName, op.operationName)
-                .append(inputType, op.inputType)
                 .append(creatorId, op.creatorId)
-                .append(operations, op.operations)
                 .append(readAccessRoles, op.readAccessRoles)
                 .append(writeAccessRoles, op.writeAccessRoles)
-                .append(parameters, op.parameters)
+                .append(uiMapping, op.uiMapping)
                 .append(metaData, op.metaData)
                 .append(outputType, op.outputType)
                 .append(score, op.score)
@@ -277,13 +146,12 @@ public class AnalyticOperationDetail implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(71, 3)
+                .append(analyticName)
                 .append(operationName)
-                .append(inputType)
                 .append(creatorId)
-                .append(operations)
                 .append(readAccessRoles)
                 .append(writeAccessRoles)
-                .append(parameters)
+                .append(uiMapping)
                 .append(metaData)
                 .append(outputType)
                 .append(score)
@@ -295,12 +163,11 @@ public class AnalyticOperationDetail implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("inputType", inputType)
+                .append("analyticName", analyticName)
                 .append("creatorId", creatorId)
-                .append("operation", operations)
                 .append("readAccessRoles", readAccessRoles)
                 .append("writeAccessRoles", writeAccessRoles)
-                .append("parameters", parameters)
+                .append("uiMapping", uiMapping)
                 .append("metaData", metaData)
                 .append("outputType", outputType)
                 .append("score", score)
@@ -341,14 +208,13 @@ public class AnalyticOperationDetail implements Serializable {
     }
 
     public static final class Builder {
+        private String analyticName;
         private String operationName;
-        private String inputType;
         private String description;
         private String creatorId;
-        private String op;
         private List<String> readers;
         private List<String> writers;
-        private Map<String, ParameterDetail> parameters;
+        private Map<String, UIMappingDetail> uiMapping;
         private Map<String, String> metaData;
         private Map<String, String> outputType;
         private Integer score;
@@ -359,13 +225,13 @@ public class AnalyticOperationDetail implements Serializable {
             return this;
         }
 
-        public AnalyticOperationDetail.Builder operationName(final String operationName) {
-            this.operationName = operationName;
+        public AnalyticOperationDetail.Builder analyticName(final String analyticName) {
+            this.analyticName = analyticName;
             return this;
         }
 
-        public AnalyticOperationDetail.Builder inputType(final String inputType) {
-            this.inputType = inputType;
+        public AnalyticOperationDetail.Builder operationName(final String operationName) {
+            this.operationName = operationName;
             return this;
         }
 
@@ -374,25 +240,8 @@ public class AnalyticOperationDetail implements Serializable {
             return this;
         }
 
-        public AnalyticOperationDetail.Builder operation(final String op) {
-
-            this.op = op;
-            return this;
-        }
-
-        public AnalyticOperationDetail.Builder operation(final OperationChain op) {
-            try {
-                this.op = new String(JSONSerialiser.serialise(op), Charset.forName(CHARSET_NAME));
-            } catch (final SerialisationException se) {
-                throw new IllegalArgumentException(se.getMessage());
-            }
-
-            return this;
-        }
-
-
-        public AnalyticOperationDetail.Builder parameters(final Map<String, ParameterDetail> parameters) {
-            this.parameters = parameters;
+        public AnalyticOperationDetail.Builder uiMapping(final Map<String, UIMappingDetail> uiMapping) {
+            this.uiMapping = uiMapping;
             return this;
         }
 
@@ -427,7 +276,7 @@ public class AnalyticOperationDetail implements Serializable {
         }
 
         public AnalyticOperationDetail build() {
-            return new AnalyticOperationDetail(operationName, inputType, description, creatorId, op, readers, writers, parameters, metaData, outputType, score, options);
+            return new AnalyticOperationDetail(analyticName, operationName, description, creatorId, readers, writers, uiMapping, metaData, outputType, score, options);
         }
     }
 }
