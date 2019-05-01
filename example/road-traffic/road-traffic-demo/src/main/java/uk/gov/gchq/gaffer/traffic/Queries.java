@@ -293,7 +293,7 @@ public class Queries {
 
         final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
                 .analyticName("analyticTest")
-                .name("frequent-vehciles-in-region")
+                .operationName("frequent-vehciles-in-region")
                 .overwrite()
                 .metaData(metaData)
                 .outputType(outputMap)
