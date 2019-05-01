@@ -16,15 +16,20 @@
 
 package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
+import uk.gov.gchq.gaffer.named.operation.NamedOperationDetail;
 import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
+import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.store.operation.handler.named.cache.NamedOperationCache;
+
+import java.util.Map;
 
 public class AddAnalyticOperationHandler implements OperationHandler<AddAnalyticOperation> {
     private final AnalyticOperationCache cache;
@@ -79,7 +84,26 @@ public class AddAnalyticOperationHandler implements OperationHandler<AddAnalytic
     private void validate(final AnalyticOperationDetail analyticOperationDetail) throws OperationException {
 
         if (null != analyticOperationDetail.getUiMapping()) {
-            // UiMapping Validation goes here.
+            Map<String, UIMappingDetail> uiMap = analyticOperationDetail.getUiMapping();
+            for (String current : analyticOperationDetail.getUiMapping().keySet()) {
+                if (uiMap.get(current).getLabel() == null) {
+                    throw new OperationException("UIMapping: label not specified.");
+                } else if (uiMap.get(current).getParameterName() == null) {
+                    throw new OperationException("UIMapping: parameterName not specified.");
+                } else if (uiMap.get(current).getUserInputType() == null) {
+                    throw new OperationException("UIMapping: userInputType not specified.");
+                } else {
+                    NamedOperationCache noc = new NamedOperationCache();
+                    try {
+                        NamedOperationDetail nod = noc.getFromCache(analyticOperationDetail.getOperationName());
+                        if (nod.getParameters().get(uiMap.get(current).getParameterName()) == null) {
+                            throw new OperationException("UIMapping: parameter '" + uiMap.get(current).getParameterName() + "' does not exist in Named Operation");
+                        }
+                    } catch (CacheOperationFailedException e) {
+                        throw new OperationException(e.getMessage());
+                    }
+                }
+            }
         }
 
         if (null == analyticOperationDetail.getOutputType()) {
