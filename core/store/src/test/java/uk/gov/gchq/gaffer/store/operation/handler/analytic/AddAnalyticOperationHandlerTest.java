@@ -16,6 +16,33 @@
 
 package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
+import com.google.common.collect.Maps;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import uk.gov.gchq.gaffer.commonutil.iterable.WrappedCloseableIterable;
+import uk.gov.gchq.gaffer.exception.SerialisationException;
+import uk.gov.gchq.gaffer.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
+import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
+import uk.gov.gchq.gaffer.operation.OperationChain;
+import uk.gov.gchq.gaffer.operation.OperationException;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
+import uk.gov.gchq.gaffer.operation.impl.add.AddElements;
+import uk.gov.gchq.gaffer.store.Context;
+import uk.gov.gchq.gaffer.store.Store;
+import uk.gov.gchq.gaffer.store.StoreProperties;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.user.User;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
@@ -25,33 +52,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-
-import com.google.common.collect.Maps;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import uk.gov.gchq.gaffer.commonutil.iterable.WrappedCloseableIterable;
-import uk.gov.gchq.gaffer.exception.SerialisationException;
-import uk.gov.gchq.gaffer.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
-import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
-import uk.gov.gchq.gaffer.operation.OperationChain;
-import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
-import uk.gov.gchq.gaffer.operation.impl.add.AddElements;
-import uk.gov.gchq.gaffer.operation.impl.get.GetElements;
-import uk.gov.gchq.gaffer.store.Context;
-import uk.gov.gchq.gaffer.store.Store;
-import uk.gov.gchq.gaffer.store.StoreProperties;
-import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
-import uk.gov.gchq.gaffer.user.User;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AddAnalyticOperationHandlerTest {
     private static final String EMPTY_ADMIN_AUTH = "";
@@ -106,27 +106,6 @@ public class AddAnalyticOperationHandlerTest {
         addAnalyticOperation.setDescription(null);
         addAnalyticOperation.setOverwriteFlag(false);
         mockCache.clear();
-    }
-
-
-    @Test
-    public void shouldNotAllowForNonRecursiveAnalyticOperationsToBeNested() throws OperationException {
-        OperationChain child = new OperationChain.Builder().first(new AddElements()).build();
-        addAnalyticOperation.setOperation(child);
-        addAnalyticOperation.setOperationName("child");
-        handler.doOperation(addAnalyticOperation, context, store);
-
-        OperationChain parent = new OperationChain.Builder()
-                .first(new AnalyticOperation.Builder().name("child").build())
-                .then(new GetElements())
-                .build();
-
-        addAnalyticOperation.setOperation(parent);
-        addAnalyticOperation.setOperationName("parent");
-
-        exception.expect(OperationException.class);
-
-        handler.doOperation(addAnalyticOperation, context, store);
     }
 
     @Test
