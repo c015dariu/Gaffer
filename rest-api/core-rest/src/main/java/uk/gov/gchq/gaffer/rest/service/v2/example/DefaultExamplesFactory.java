@@ -483,7 +483,6 @@ public class DefaultExamplesFactory implements ExamplesFactory {
     @Override
     public AddAnalyticOperation AddAnalyticOperation() {
         String USER = "User";
-        OperationChain OPERATION_CHAIN = new OperationChain.Builder().first(new GetAdjacentIds.Builder().input(new EntitySeed("seed")).build()).build();
 
         Map<String, String> metaData = new HashMap<>();
         metaData.put("iconURL", "example.png");
@@ -492,7 +491,6 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         outputType.put("output", "table");
 
         return new AddAnalyticOperation.Builder()
-                .operation(OPERATION_CHAIN)
                 .description("Adds an Example Analytic Operation")
                 .name("Example Analytic Operation")
                 .overwrite(false)

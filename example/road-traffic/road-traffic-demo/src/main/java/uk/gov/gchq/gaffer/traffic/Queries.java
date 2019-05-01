@@ -292,8 +292,8 @@ public class Queries {
                 .build();
 
         final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
-                .name("analyticTest")
-                .operation(runExampleNamedOperation)
+                .analyticName("analyticTest")
+                .name("frequent-vehciles-in-region")
                 .overwrite()
                 .metaData(metaData)
                 .outputType(outputMap)
