@@ -492,7 +492,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
 
         return new AddAnalyticOperation.Builder()
                 .description("Adds an Example Analytic Operation")
-                .name("Example Analytic Operation")
+                .operationName("Example Analytic Operation")
                 .overwrite(false)
                 .readAccessRoles(USER)
                 .writeAccessRoles(USER)
