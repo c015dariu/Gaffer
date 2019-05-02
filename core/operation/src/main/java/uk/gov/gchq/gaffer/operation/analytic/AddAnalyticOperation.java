@@ -19,7 +19,6 @@ package uk.gov.gchq.gaffer.operation.analytic;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import uk.gov.gchq.gaffer.commonutil.CommonConstants;
 import uk.gov.gchq.gaffer.commonutil.Required;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.koryphe.Since;
@@ -49,8 +48,6 @@ public class AddAnalyticOperation implements Operation {
     private Integer score;
     private Map<String, String> metaData;
     private Map<String, String> outputType;
-
-    private static final String CHARSET_NAME = CommonConstants.UTF_8;
 
     public boolean isOverwriteFlag() {
         return overwriteFlag;
@@ -100,6 +97,7 @@ public class AddAnalyticOperation implements Operation {
         this.description = description;
     }
 
+    @JsonSetter("uiMapping")
     public void setUiMapping(final Map<String, UIMappingDetail> uiMapping) {
         this.uiMapping = uiMapping;
     }

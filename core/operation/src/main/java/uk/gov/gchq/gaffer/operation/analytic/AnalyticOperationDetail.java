@@ -55,6 +55,10 @@ public class AnalyticOperationDetail implements Serializable {
             throw new IllegalArgumentException("Operation Name must not be empty");
         }
 
+        if (null == analyticName || analyticName.isEmpty()) {
+            throw new IllegalArgumentException("Analytic Name must not be empty");
+        }
+
         this.analyticName = analyticName;
         this.operationName = operationName;
         this.description = description;
@@ -164,6 +168,7 @@ public class AnalyticOperationDetail implements Serializable {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("analyticName", analyticName)
+                .append("operationName", operationName)
                 .append("creatorId", creatorId)
                 .append("readAccessRoles", readAccessRoles)
                 .append("writeAccessRoles", writeAccessRoles)

@@ -32,7 +32,6 @@ import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperati
  */
 public class GetAllAnalyticOperationHandler implements OutputOperationHandler<GetAllAnalyticOperations, CloseableIterable<AnalyticOperationDetail>> {
     private final AnalyticOperationCache cache;
-    private static Context context;
 
     public GetAllAnalyticOperationHandler() {
         this(new AnalyticOperationCache());
@@ -55,7 +54,6 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
      */
     @Override
     public CloseableIterable<AnalyticOperationDetail> doOperation(final GetAllAnalyticOperations operation, final Context context, final Store store) throws OperationException {
-        GetAllAnalyticOperationHandler.context = context;
         final CloseableIterable<AnalyticOperationDetail> ops = cache.getAllAnalyticOperations(context.getUser(), store.getProperties().getAdminAuth());
         return new WrappedCloseableIterable<>(ops);
     }

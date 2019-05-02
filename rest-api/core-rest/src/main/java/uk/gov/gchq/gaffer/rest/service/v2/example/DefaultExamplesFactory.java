@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.gaffer.rest.service.v2.example;
 
+import com.google.common.collect.Maps;
+
 import uk.gov.gchq.gaffer.data.element.Edge;
 import uk.gov.gchq.gaffer.data.element.Element;
 import uk.gov.gchq.gaffer.data.element.Entity;
@@ -30,6 +32,7 @@ import uk.gov.gchq.gaffer.named.view.AddNamedView;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.operation.data.EdgeSeed;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
 import uk.gov.gchq.gaffer.operation.impl.GetWalks;
@@ -483,23 +486,30 @@ public class DefaultExamplesFactory implements ExamplesFactory {
     @Override
     public AddAnalyticOperation AddAnalyticOperation() {
         String USER = "User";
-
+        Map<String, UIMappingDetail> uiMapping = Maps.newHashMap();
+        uiMapping.put("param1", new UIMappingDetail.Builder()
+                .label("Maximum Results")
+                .userInputType("TextBox")
+                .parameterName("finalMaxResultLimit")
+                .build());
         Map<String, String> metaData = new HashMap<>();
-        metaData.put("iconURL", "example.png");
-
+        metaData.put("iconURL", "location_off");
         Map<String, String> outputType = new HashMap<>();
-        outputType.put("output", "table");
+        outputType.put("output","table");
 
-        return new AddAnalyticOperation.Builder()
-                .description("Adds an Example Analytic Operation")
-                .operationName("Example Analytic Operation")
-                .overwrite(false)
+        AddAnalyticOperation AddAnalyticOperation = new AddAnalyticOperation.Builder()
+                .analyticName("Analytic1")
+                .operationName("Operation1")
+                .description("Description")
                 .readAccessRoles(USER)
                 .writeAccessRoles(USER)
+                .overwrite(false)
+                .uiMapping(uiMapping)
                 .metaData(metaData)
                 .outputType(outputType)
-                .score(2)
+                .score(4)
                 .build();
+        return AddAnalyticOperation;
     }
 
     @Override
