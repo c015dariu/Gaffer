@@ -42,6 +42,7 @@ import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
 import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
+import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
 import uk.gov.gchq.gaffer.operation.graph.SeededGraphFilters;
 import uk.gov.gchq.gaffer.operation.impl.add.AddElements;
@@ -273,8 +274,9 @@ public class Queries {
         graph.execute(addFullExampleNamedOperation, user);
         final Map<String, Object> paramMap = Maps.newHashMap();
         paramMap.put("vehicle", "BUS");
-        final Map<String, Object> paramMap2 = Maps.newHashMap();
-        paramMap2.put("result-limit", 2);
+        final Map<String, UIMappingDetail> uiMap = Maps.newHashMap();
+        final UIMappingDetail param1 = new UIMappingDetail.Builder().label("test").parameterName("result-limit").userInputType("textBox").build();
+        uiMap.put("test", param1);
         final Map<String, String> metaData = Maps.newHashMap();
         metaData.put("iconURL", "pic.jpg");
         final Map<String, String> outputMap = Maps.newHashMap();
@@ -293,8 +295,9 @@ public class Queries {
 
         final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
                 .analyticName("analyticTest")
-                .operationName("frequent-vehciles-in-region")
+                .operationName("frequent-vehicles-in-region")
                 .overwrite()
+                .uiMapping(uiMap)
                 .metaData(metaData)
                 .outputType(outputMap)
                 .build();

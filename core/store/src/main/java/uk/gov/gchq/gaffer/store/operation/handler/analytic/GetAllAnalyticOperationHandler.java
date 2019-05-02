@@ -19,19 +19,26 @@ package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
 import uk.gov.gchq.gaffer.commonutil.iterable.CloseableIterable;
 import uk.gov.gchq.gaffer.commonutil.iterable.WrappedCloseableIterable;
+import uk.gov.gchq.gaffer.named.operation.NamedOperationDetail;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
 import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
+import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OutputOperationHandler;
 import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.store.operation.handler.named.cache.NamedOperationCache;
+import uk.gov.gchq.koryphe.util.IterableUtil;
+
+import java.util.function.Function;
 
 /**
  * Operation Handler for GetAllAnalyticOperations
  */
 public class GetAllAnalyticOperationHandler implements OutputOperationHandler<GetAllAnalyticOperations, CloseableIterable<AnalyticOperationDetail>> {
     private final AnalyticOperationCache cache;
+    private static Context context;
 
     public GetAllAnalyticOperationHandler() {
         this(new AnalyticOperationCache());
@@ -54,7 +61,37 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
      */
     @Override
     public CloseableIterable<AnalyticOperationDetail> doOperation(final GetAllAnalyticOperations operation, final Context context, final Store store) throws OperationException {
+        GetAllAnalyticOperationHandler.context = context;
         final CloseableIterable<AnalyticOperationDetail> ops = cache.getAllAnalyticOperations(context.getUser(), store.getProperties().getAdminAuth());
-        return new WrappedCloseableIterable<>(ops);
+        return new WrappedCloseableIterable<>(IterableUtil.map(ops, new AddInputType()));
+    }
+
+    private static class AddInputType implements Function<AnalyticOperationDetail, AnalyticOperationDetail> {
+
+        @Override
+        public AnalyticOperationDetail apply(final AnalyticOperationDetail analyticOp) {
+            return resolveParameters(analyticOp);
+        }
+
+        private AnalyticOperationDetail resolveParameters(final AnalyticOperationDetail analyticOp) {
+            if (null != analyticOp) {
+                try {
+                    NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(analyticOp.getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
+                    for (String currentParam : nod.getParameters().keySet()) {
+                        for (String uiKey : analyticOp.getUiMapping().keySet()) {
+                            UIMappingDetail uiParam = analyticOp.getUiMapping().get(uiKey);
+                            if (uiParam.getParameterName().equals(currentParam)) {
+                                uiParam.setInputClass(nod.getParameters().get(currentParam).getValueClass());
+                                analyticOp.getUiMapping().put(uiKey, uiParam);
+                            }
+                        }
+                    }
+
+                } catch (final Exception e) {
+                    // ignore - no need to map parameters
+                }
+            }
+            return analyticOp;
+        }
     }
 }
