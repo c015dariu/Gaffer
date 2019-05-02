@@ -28,7 +28,6 @@ import uk.gov.gchq.gaffer.commonutil.pair.Pair;
 import uk.gov.gchq.gaffer.data.elementdefinition.exception.SchemaException;
 import uk.gov.gchq.gaffer.data.elementdefinition.view.NamedView;
 import uk.gov.gchq.gaffer.data.elementdefinition.view.View;
-import uk.gov.gchq.gaffer.graph.hook.AnalyticOperationResolver;
 import uk.gov.gchq.gaffer.graph.hook.GraphHook;
 import uk.gov.gchq.gaffer.graph.hook.NamedOperationResolver;
 import uk.gov.gchq.gaffer.graph.hook.NamedViewResolver;
@@ -41,7 +40,6 @@ import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.Operations;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation;
 import uk.gov.gchq.gaffer.operation.graph.OperationView;
 import uk.gov.gchq.gaffer.operation.io.Output;
 import uk.gov.gchq.gaffer.store.Context;
@@ -977,15 +975,11 @@ public final class Graph {
         }
 
         private void updateGraphHooks(final GraphConfig config) {
-            boolean hasAnalyticOpHook = false;
             boolean hasNamedOpHook = false;
             boolean hasNamedViewHook = false;
             for (final GraphHook graphHook : config.getHooks()) {
                 if (NamedOperationResolver.class.isAssignableFrom(graphHook.getClass())) {
                     hasNamedOpHook = true;
-                }
-                if (AnalyticOperationResolver.class.isAssignableFrom(graphHook.getClass())) {
-                    hasAnalyticOpHook = true;
                 }
                 if (NamedViewResolver.class.isAssignableFrom(graphHook.getClass())) {
                     hasNamedViewHook = true;
@@ -997,11 +991,6 @@ public final class Graph {
             if (!hasNamedOpHook) {
                 if (store.isSupported(NamedOperation.class)) {
                     config.getHooks().add(0, new NamedOperationResolver());
-                }
-            }
-            if (!hasAnalyticOpHook) {
-                if (store.isSupported(AnalyticOperation.class)) {
-                    config.getHooks().add(0, new AnalyticOperationResolver());
                 }
             }
         }

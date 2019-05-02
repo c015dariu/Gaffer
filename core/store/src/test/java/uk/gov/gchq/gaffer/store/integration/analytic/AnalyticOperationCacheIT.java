@@ -1,39 +1,7 @@
 package uk.gov.gchq.gaffer.store.integration.analytic;
 
-import com.google.common.collect.Lists;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import uk.gov.gchq.gaffer.cache.CacheServiceLoader;
-import uk.gov.gchq.gaffer.cache.exception.CacheOperationException;
-import uk.gov.gchq.gaffer.cache.impl.HashMapCacheService;
-import uk.gov.gchq.gaffer.cache.util.CacheProperties;
-import uk.gov.gchq.gaffer.operation.OperationChain;
-import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
-import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
-import uk.gov.gchq.gaffer.operation.impl.get.GetAllElements;
-import uk.gov.gchq.gaffer.store.Context;
-import uk.gov.gchq.gaffer.store.Store;
-import uk.gov.gchq.gaffer.store.StoreProperties;
-import uk.gov.gchq.gaffer.store.operation.handler.analytic.AddAnalyticOperationHandler;
-import uk.gov.gchq.gaffer.store.operation.handler.analytic.GetAllAnalyticOperationHandler;
-import uk.gov.gchq.gaffer.user.User;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
 public class AnalyticOperationCacheIT {
-    private static final String CACHE_NAME = "AnalyticOperation";
+    /*private static final String CACHE_NAME = "AnalyticOperation";
     private final Properties cacheProps = new Properties();
     private final Store store = mock(Store.class);
     private final String adminAuth = "admin auth";
@@ -149,7 +117,7 @@ public class AnalyticOperationCacheIT {
 
     }*/
 
-    private void shouldAllowUpdatingOfAnalyticOperations() throws OperationException {
+    /*private void shouldAllowUpdatingOfAnalyticOperations() throws OperationException {
         // given
         final Store store = mock(Store.class);
         final StoreProperties storeProps = mock(StoreProperties.class);
@@ -301,5 +269,5 @@ public class AnalyticOperationCacheIT {
         // then
         assertEquals(expected.size(), results.size());
         assertEquals(expected, results);
-    }
+    }*/
 }

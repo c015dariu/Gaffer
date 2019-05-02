@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * Wrapper around the {@link CacheServiceLoader} to provide an interface for handling
- * the {@link uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation}s for a Gaffer graph.
+ * the {@link uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail}s for a Gaffer graph.
  */
 public class AnalyticOperationCache {
 
@@ -166,7 +166,7 @@ public class AnalyticOperationCache {
     }
 
     /**
-     * Delete the specified {@link uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation}
+     * Delete the specified {@link uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail}
      * from the cache.
      *
      * @param name the name of the operation to delete
@@ -226,7 +226,7 @@ public class AnalyticOperationCache {
     private void add(final AnalyticOperationDetail analyticOperation, final boolean overwrite, final User user, final String adminAuth) throws CacheOperationFailedException {
         String name;
         try {
-            name = analyticOperation.getOperationName();
+            name = analyticOperation.getAnalyticName();
         } catch (final NullPointerException e) {
             throw new CacheOperationFailedException("AnalyticOperation cannot be null", e);
         }

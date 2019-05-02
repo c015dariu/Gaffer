@@ -40,7 +40,6 @@ import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationException;
 import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperation;
 import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
 import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
@@ -293,8 +292,8 @@ public class Queries {
                 .build();
 
         final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
-                .name("analyticTest")
-                .operation(runExampleNamedOperation)
+                .analyticName("analyticTest")
+                .operationName("frequent-vehciles-in-region")
                 .overwrite()
                 .metaData(metaData)
                 .outputType(outputMap)
@@ -302,17 +301,6 @@ public class Queries {
 
         graph.execute(addAnalyticOperation, user);
         graph.execute(getAna, user);
-
-        final AnalyticOperation runAnalyticOperation = new AnalyticOperation.Builder<EntityId, CloseableIterable<? extends Element>>()
-                .name("analyticTest")
-                .parameters(paramMap2)
-                .build();
-
-        final OperationChain operationChain = new OperationChain.Builder()
-                .first(getElements)
-                .then(runAnalyticOperation)
-                .build();
-
         CloseableIterable<? extends AnalyticOperationDetail> results = graph.execute(getAna, user);
 
         try {

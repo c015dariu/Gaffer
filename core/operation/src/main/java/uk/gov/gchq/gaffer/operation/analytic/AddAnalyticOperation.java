@@ -16,31 +16,15 @@
 
 package uk.gov.gchq.gaffer.operation.analytic;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.StringUtils;
 
-import uk.gov.gchq.gaffer.commonutil.CommonConstants;
 import uk.gov.gchq.gaffer.commonutil.Required;
-import uk.gov.gchq.gaffer.exception.SerialisationException;
-import uk.gov.gchq.gaffer.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.gaffer.named.operation.NamedOperation;
-import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
 import uk.gov.gchq.gaffer.operation.Operation;
-import uk.gov.gchq.gaffer.operation.OperationChain;
-import uk.gov.gchq.gaffer.operation.OperationChainDAO;
-import uk.gov.gchq.gaffer.operation.Operations;
 import uk.gov.gchq.koryphe.Since;
 import uk.gov.gchq.koryphe.Summary;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -48,24 +32,22 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-@JsonPropertyOrder(value = {"class", "operationName", "description", "score", "operation"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "operationName", "description", "score"}, alphabetic = true)
 @Since("1.0.0")
 @Summary("Adds a new analytic")
-public class AddAnalyticOperation implements Operation, Operations<Operation> {
+public class AddAnalyticOperation implements Operation {
     @Required
-    private String operations;
+    private String analyticName;
     private String operationName;
     private String description;
     private List<String> readAccessRoles = new ArrayList<>();
     private List<String> writeAccessRoles = new ArrayList<>();
     private boolean overwriteFlag = false;
-    private Map<String, ParameterDetail> parameters;
+    private Map<String, UIMappingDetail> uiMapping;
     private Map<String, String> options;
     private Integer score;
     private Map<String, String> metaData;
     private Map<String, String> outputType;
-
-    private static final String CHARSET_NAME = CommonConstants.UTF_8;
 
     public boolean isOverwriteFlag() {
         return overwriteFlag;
@@ -75,37 +57,12 @@ public class AddAnalyticOperation implements Operation, Operations<Operation> {
         this.overwriteFlag = overwriteFlag;
     }
 
-    @JsonIgnore
-    public void setOperation(final String operation) {
-        this.operations = operation;
+    public void setAnalyticName(final String analyticName) {
+        this.analyticName = analyticName;
     }
 
-    @JsonSetter("operation")
-    public void setOperation(final JsonNode opNode) {
-        this.operations = opNode.toString();
-    }
-
-    @JsonIgnore
-    public String getOperationAsString() {
-        return operations;
-    }
-
-    @JsonGetter("operation")
-    public JsonNode getOperationAsJsonNode() {
-        try {
-            return JSONSerialiser.getJsonNodeFromString(operations);
-        } catch (final SerialisationException se) {
-            throw new IllegalArgumentException(se.getMessage());
-        }
-    }
-
-    @JsonIgnore
-    public void setOperation(final Operation operation) {
-        try {
-            this.operations = new String(JSONSerialiser.serialise(operation), Charset.forName(CHARSET_NAME));
-        } catch (final SerialisationException se) {
-            throw new IllegalArgumentException(se.getMessage());
-        }
+    public String getAnalyticName() {
+        return analyticName;
     }
 
     public String getOperationName() {
@@ -140,12 +97,13 @@ public class AddAnalyticOperation implements Operation, Operations<Operation> {
         this.description = description;
     }
 
-    public void setParameters(final Map<String, ParameterDetail> parameters) {
-        this.parameters = parameters;
+    @JsonSetter("uiMapping")
+    public void setUiMapping(final Map<String, UIMappingDetail> uiMapping) {
+        this.uiMapping = uiMapping;
     }
 
-    public Map<String, ParameterDetail> getParameters() {
-        return parameters;
+    public Map<String, UIMappingDetail> getUiMapping() {
+        return uiMapping;
     }
 
     @JsonSetter("metaData")
@@ -169,13 +127,13 @@ public class AddAnalyticOperation implements Operation, Operations<Operation> {
     @Override
     public AddAnalyticOperation shallowClone() {
         return new AddAnalyticOperation.Builder()
-                .operation(operations)
-                .name(operationName)
+                .analyticName(analyticName)
+                .operationName(operationName)
                 .description(description)
                 .readAccessRoles(readAccessRoles.toArray(new String[readAccessRoles.size()]))
                 .writeAccessRoles(writeAccessRoles.toArray(new String[writeAccessRoles.size()]))
                 .overwrite(overwriteFlag)
-                .parameters(parameters)
+                .uiMapping(uiMapping)
                 .metaData(metaData)
                 .outputType(outputType)
                 .options(options)
@@ -201,83 +159,17 @@ public class AddAnalyticOperation implements Operation, Operations<Operation> {
         this.score = score;
     }
 
-    /**
-     * @return a list of the operations in the operation chain resolved using the default parameters.
-     */
-    @Override
-    @JsonIgnore
-    public Collection<Operation> getOperations() {
-        return getOperationsWithDefaultParams();
-    }
-
-    @Override
-    public void updateOperations(final Collection<Operation> operations) {
-        // ignore - Analytic operations will be updated when run instead
-    }
-
-    private Collection<Operation> getOperationsWithDefaultParams() {
-        String opStringWithDefaults = operations;
-
-        if (null != parameters) {
-            for (final Map.Entry<String, ParameterDetail> parameterDetailPair : parameters.entrySet()) {
-                String paramKey = parameterDetailPair.getKey();
-
-                try {
-                    opStringWithDefaults = opStringWithDefaults.replace(buildParamNameString(paramKey),
-                            new String(JSONSerialiser.serialise(parameterDetailPair.getValue().getDefaultValue(), CHARSET_NAME), CHARSET_NAME));
-                } catch (final SerialisationException | UnsupportedEncodingException e) {
-                    throw new IllegalArgumentException(e.getMessage());
-                }
-            }
-        }
-
-        Operation op;
-        if (StringUtils.isEmpty(opStringWithDefaults)) {
-            op = null;
-        } else {
-            try {
-                op = JSONSerialiser.deserialise(opStringWithDefaults.getBytes(CHARSET_NAME), OperationChainDAO.class);
-            } catch (final Exception e) {
-                try {
-                    op = JSONSerialiser.deserialise(opStringWithDefaults.getBytes(CHARSET_NAME), NamedOperation.class);
-                } catch (final Exception f) {
-                    op = null;
-                }
-            }
-        }
-        final Collection<Operation> operations;
-        if (op instanceof Operations && !(op instanceof NamedOperation)) {
-            operations = ((OperationChain) op).getOperations();
-            return operations;
-        } else if (op instanceof NamedOperation) {
-            operations = ((NamedOperation) op).getOperations();
-            operations.add(op);
-            return operations;
-        } else {
-            return Arrays.asList(op);
-        }
-    }
-
-    private String buildParamNameString(final String paramKey) {
-        return "\"${" + paramKey + "}\"";
-    }
-
     public static class Builder extends BaseBuilder<AddAnalyticOperation, AddAnalyticOperation.Builder> {
         public Builder() {
             super(new AddAnalyticOperation());
         }
 
-        public AddAnalyticOperation.Builder operation(final String opString) {
-            _getOp().setOperation(opString);
+        public AddAnalyticOperation.Builder analyticName(final String analyticName) {
+            _getOp().setAnalyticName(analyticName);
             return _self();
         }
 
-        public AddAnalyticOperation.Builder operation(final Operation op) {
-            _getOp().setOperation(op);
-            return _self();
-        }
-
-        public AddAnalyticOperation.Builder name(final String name) {
+        public AddAnalyticOperation.Builder operationName(final String name) {
             _getOp().setOperationName(name);
             return _self();
         }
@@ -297,18 +189,18 @@ public class AddAnalyticOperation implements Operation, Operations<Operation> {
             return _self();
         }
 
-        public AddAnalyticOperation.Builder parameters(final Map<String, ParameterDetail> parameters) {
-            _getOp().setParameters(parameters);
+        public AddAnalyticOperation.Builder uiMapping(final Map<String, UIMappingDetail> uiMapping) {
+            _getOp().setUiMapping(uiMapping);
             return _self();
         }
 
-        public AddAnalyticOperation.Builder parameter(final String name, final ParameterDetail detail) {
-            Map<String, ParameterDetail> parameters = _getOp().getParameters();
-            if (isNull(parameters)) {
-                parameters = new HashMap<>();
-                _getOp().setParameters(parameters);
+        public AddAnalyticOperation.Builder uiMapping(final String name, final UIMappingDetail detail) {
+            Map<String, UIMappingDetail> uiMapping = _getOp().getUiMapping();
+            if (isNull(uiMapping)) {
+                uiMapping = new HashMap<>();
+                _getOp().setUiMapping(uiMapping);
             }
-            parameters.put(name, detail);
+            uiMapping.put(name, detail);
             return _self();
         }
 
