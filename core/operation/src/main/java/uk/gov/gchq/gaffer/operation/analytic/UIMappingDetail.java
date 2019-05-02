@@ -34,8 +34,13 @@ public class UIMappingDetail implements Serializable {
     private String label;
     private String userInputType;
     private String parameterName;
+    private Class inputClass;
 
     public UIMappingDetail(final String label, final String userInputType, final String parameterName) {
+        this(label, userInputType, parameterName, null);
+    }
+
+    public UIMappingDetail(final String label, final String userInputType, final String parameterName, final Class inputClass) {
         if (null == label) {
             throw new IllegalArgumentException("label must not be empty");
         }
@@ -49,6 +54,7 @@ public class UIMappingDetail implements Serializable {
         this.label = label;
         this.userInputType = userInputType;
         this.parameterName = parameterName;
+        this.inputClass = inputClass;
     }
 
     public String getLabel() {
@@ -61,6 +67,14 @@ public class UIMappingDetail implements Serializable {
 
     public String getParameterName() {
         return parameterName;
+    }
+
+    public Class getInputClass() {
+        return inputClass;
+    }
+
+    public void setInputClass(Class inputClass) {
+        this.inputClass = inputClass;
     }
 
     @Override
@@ -79,6 +93,7 @@ public class UIMappingDetail implements Serializable {
                 .append(label, pd.label)
                 .append(userInputType, pd.userInputType)
                 .append(parameterName, pd.parameterName)
+                .append(inputClass, pd.inputClass)
                 .isEquals();
     }
 
@@ -88,6 +103,7 @@ public class UIMappingDetail implements Serializable {
                 .append(label)
                 .append(userInputType)
                 .append(parameterName)
+                .append(inputClass)
                 .hashCode();
     }
 
@@ -98,6 +114,7 @@ public class UIMappingDetail implements Serializable {
                 .append("label", label)
                 .append("userInputType", userInputType)
                 .append("parameterName", parameterName)
+                .append("inputClass", inputClass)
                 .toString();
     }
 
@@ -106,6 +123,7 @@ public class UIMappingDetail implements Serializable {
         private String label;
         private String userInputType;
         private String parameterName;
+        private Class inputClass;
 
         public Builder label(final String label) {
             this.label = label;
@@ -122,8 +140,13 @@ public class UIMappingDetail implements Serializable {
             return this;
         }
 
+        public Builder inputClass(final Class inputClass) {
+            this.inputClass = inputClass;
+            return this;
+        }
+
         public UIMappingDetail build() {
-            return new UIMappingDetail(label, userInputType, parameterName);
+            return new UIMappingDetail(label, userInputType, parameterName, inputClass);
         }
     }
 }
