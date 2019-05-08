@@ -1,19 +1,55 @@
 package uk.gov.gchq.gaffer.store.integration.analytic;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.gov.gchq.gaffer.cache.CacheServiceLoader;
+import uk.gov.gchq.gaffer.cache.exception.CacheOperationException;
+import uk.gov.gchq.gaffer.cache.impl.HashMapCacheService;
+import uk.gov.gchq.gaffer.cache.util.CacheProperties;
+import uk.gov.gchq.gaffer.operation.OperationException;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
+import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
+import uk.gov.gchq.gaffer.store.Context;
+import uk.gov.gchq.gaffer.store.Store;
+import uk.gov.gchq.gaffer.store.StoreProperties;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.AddAnalyticOperationHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.DeleteAnalyticOperationHandler;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.GetAllAnalyticOperationHandler;
+import uk.gov.gchq.gaffer.user.User;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
 public class AnalyticOperationCacheIT {
-    /*private static final String CACHE_NAME = "AnalyticOperation";
+    private static final String CACHE_NAME = "AnalyticOperation";
     private final Properties cacheProps = new Properties();
     private final Store store = mock(Store.class);
     private final String adminAuth = "admin auth";
     private final StoreProperties properties = new StoreProperties();
 
+    private final HashMap<String, String> outputType = Maps.newHashMap();
+    private final HashMap<String, String> metaData = Maps.newHashMap();
+
     private AddAnalyticOperation add = new AddAnalyticOperation.Builder()
-            .name("op")
+            .analyticName("op")
+            .operationName("op1")
             .description("test operation")
-            .operation(new OperationChain.Builder()
-                    .first(new GetAllElements.Builder()
-                            .build())
-                    .build())
+            .outputType(outputType)
+            .metaData(metaData)
             .overwrite()
             .score(0)
             .build();
@@ -24,7 +60,7 @@ public class AnalyticOperationCacheIT {
     private Context context = new Context(user);
     private GetAllAnalyticOperationHandler getAllAnalyticOperationHandler = new GetAllAnalyticOperationHandler();
     private AddAnalyticOperationHandler addAnalyticOperationHandler = new AddAnalyticOperationHandler();
-    //private GetAllAnalyticOperationHandler getAllAnalyticOperationHandler1 = new GetAllAnalyticOperationHandler();
+    private DeleteAnalyticOperationHandler deleteAnalyticOperationHandler = new DeleteAnalyticOperationHandler();
     private GetAllAnalyticOperations get = new GetAllAnalyticOperations();
 
     @Before
@@ -41,6 +77,8 @@ public class AnalyticOperationCacheIT {
 
     @Test
     public void shouldWorkUsingHashMapServiceClass() throws OperationException, CacheOperationException {
+        outputType.put("output", "graph");
+        metaData.put("iconURL", "example");
         reInitialiseCacheService(HashMapCacheService.class);
         runTests();
     }
@@ -62,7 +100,7 @@ public class AnalyticOperationCacheIT {
         after();
         shouldBeAbleToAddAnalyticOperationToCache();
         after();
-        //shouldBeAbleToDeleteAnalyticOperationFromCache();
+        shouldBeAbleToDeleteAnalyticOperationFromCache();
     }
 
 
@@ -77,12 +115,14 @@ public class AnalyticOperationCacheIT {
 
         AnalyticOperationDetail expectedAnalyticOp = new AnalyticOperationDetail.Builder()
                 .operationName(add.getOperationName())
-                .operation(add.getOperationAsString())
+                .analyticName(add.getAnalyticName())
                 .creatorId(user.getUserId())
                 .readers(new ArrayList<>())
                 .writers(new ArrayList<>())
                 .description(add.getDescription())
                 .score(0)
+                .outputType(outputType)
+                .metaData(metaData)
                 .build();
 
         List<AnalyticOperationDetail> expected = Lists.newArrayList(expectedAnalyticOp);
@@ -94,7 +134,7 @@ public class AnalyticOperationCacheIT {
     }
 
 
-    /*private void shouldBeAbleToDeleteAnalyticOperationFromCache() throws OperationException {
+    private void shouldBeAbleToDeleteAnalyticOperationFromCache() throws OperationException {
         // given
         final Store store = mock(Store.class);
         given(store.getProperties()).willReturn(properties);
@@ -110,14 +150,14 @@ public class AnalyticOperationCacheIT {
         // when
         deleteAnalyticOperationHandler.doOperation(del, context, store);
 
-        List<AnalyticOperationDetail> results = Lists.newArrayList(getAllAnalyticOperationHandler1.doOperation(get, context, store));
+        List<AnalyticOperationDetail> results = Lists.newArrayList(getAllAnalyticOperationHandler.doOperation(get, context, store));
 
         // then
         assertEquals(0, results.size());
 
-    }*/
+    }
 
-    /*private void shouldAllowUpdatingOfAnalyticOperations() throws OperationException {
+    private void shouldAllowUpdatingOfAnalyticOperations() throws OperationException {
         // given
         final Store store = mock(Store.class);
         final StoreProperties storeProps = mock(StoreProperties.class);
@@ -126,10 +166,12 @@ public class AnalyticOperationCacheIT {
         new AddAnalyticOperationHandler().doOperation(add, context, store);
 
         AddAnalyticOperation update = new AddAnalyticOperation.Builder()
-                .name(add.getOperationName())
+                .analyticName(add.getAnalyticName())
+                .operationName(add.getOperationName())
                 .description("a different operation")
-                .operation(add.getOperationAsString())
                 .overwrite()
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
@@ -142,11 +184,13 @@ public class AnalyticOperationCacheIT {
 
         AnalyticOperationDetail expectedAnalyticOp = new AnalyticOperationDetail.Builder()
                 .operationName(update.getOperationName())
-                .operation(update.getOperationAsString())
+                .analyticName(update.getAnalyticName())
                 .description(update.getDescription())
                 .creatorId(user.getUserId())
                 .readers(new ArrayList<>())
                 .writers(new ArrayList<>())
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
@@ -165,10 +209,12 @@ public class AnalyticOperationCacheIT {
         new AddAnalyticOperationHandler().doOperation(add, context, store);
 
         AddAnalyticOperation update = new AddAnalyticOperation.Builder()
-                .name(add.getOperationName())
+                .operationName(add.getOperationName())
                 .description("a different operation")
-                .operation(add.getOperationAsString())
+                .analyticName(add.getAnalyticName())
                 .overwrite()
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
@@ -181,11 +227,13 @@ public class AnalyticOperationCacheIT {
 
         AnalyticOperationDetail expectedAnalyticOp = new AnalyticOperationDetail.Builder()
                 .operationName(update.getOperationName())
-                .operation(update.getOperationAsString())
+                .analyticName(update.getAnalyticName())
                 .description(update.getDescription())
                 .creatorId(user.getUserId())
                 .readers(new ArrayList<>())
                 .writers(new ArrayList<>())
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
@@ -202,11 +250,13 @@ public class AnalyticOperationCacheIT {
         Context contextWithAdminUser = new Context(adminAuthUser);
         AnalyticOperationDetail expectedAnalyticOp = new AnalyticOperationDetail.Builder()
                 .operationName(add.getOperationName())
-                .operation(add.getOperationAsString())
+                .analyticName(add.getAnalyticName())
                 .description(add.getDescription())
                 .creatorId(authorisedUser.getUserId())
                 .readers(new ArrayList<>())
                 .writers(new ArrayList<>())
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
         ArrayList<AnalyticOperationDetail> expected = Lists.newArrayList(expectedAnalyticOp);
@@ -234,20 +284,24 @@ public class AnalyticOperationCacheIT {
         addAnalyticOperationHandler.doOperation(add, contextWithAuthorisedUser, store);
 
         AddAnalyticOperation update = new AddAnalyticOperation.Builder()
-                .name(add.getOperationName())
+                .operationName(add.getOperationName())
                 .description("a different operation")
-                .operation(add.getOperationAsString())
+                .analyticName(add.getAnalyticName())
                 .overwrite()
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
         AnalyticOperationDetail expectedAnalyticOp = new AnalyticOperationDetail.Builder()
                 .operationName(update.getOperationName())
-                .operation(update.getOperationAsString())
+                .analyticName(update.getAnalyticName())
                 .description(update.getDescription())
                 .creatorId(adminAuthUser.getUserId())
                 .readers(new ArrayList<>())
                 .writers(new ArrayList<>())
+                .outputType(outputType)
+                .metaData(metaData)
                 .score(0)
                 .build();
 
@@ -269,5 +323,5 @@ public class AnalyticOperationCacheIT {
         // then
         assertEquals(expected.size(), results.size());
         assertEquals(expected, results);
-    }*/
+    }
 }

@@ -303,7 +303,6 @@ public class Queries {
                 .build();
 
         graph.execute(addAnalyticOperation, user);
-        graph.execute(getAna, user);
         CloseableIterable<? extends AnalyticOperationDetail> results = graph.execute(getAna, user);
 
         try {
