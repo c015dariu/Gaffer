@@ -88,7 +88,7 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
                     }
 
                 } catch (final Exception e) {
-                    // ignore - no need to map parameters
+                    // Can't find the parameter.
                 }
             }
             return analyticOp;
