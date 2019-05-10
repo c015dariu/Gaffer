@@ -47,7 +47,7 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
         Map<String, String> metaData = new HashMap<>();
         metaData.put("iconURL", "icon");
         Map<String, String> outputType = new HashMap<>();
-        outputType.put("output","table");
+        outputType.put("output", "table");
 
         AddAnalyticOperation AddAnalyticOperation = new AddAnalyticOperation.Builder()
                 .analyticName("Test Analytic name")
@@ -101,13 +101,13 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
     public void builderShouldCreatePopulatedOperation() {
         // Given
         Map<String, UIMappingDetail> uiMapping = Maps.newHashMap();
-        uiMapping.put("uiMappingConstructorTest", new UIMappingDetail("Maximum Results","String", "finalMaxResultLimit") );
+        uiMapping.put("uiMappingConstructorTest", new UIMappingDetail("Maximum Results", "String", "finalMaxResultLimit"));
         Map<String, String> options = new HashMap<>();
-        options.put("option1","example Option");
+        options.put("option1", "example Option");
         Map<String, String> metaData = new HashMap<>();
         metaData.put("iconURL", "icon");
         Map<String, String> outputType = new HashMap<>();
-        outputType.put("output","table");
+        outputType.put("output", "table");
 
         AddAnalyticOperation AddAnalyticOperation = new Builder()
                 .analyticName("Test Analytic name")
@@ -125,7 +125,7 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
         // When
 
         // Then
-        assertEquals("Test Analytic name",AddAnalyticOperation.getAnalyticName());
+        assertEquals("Test Analytic name", AddAnalyticOperation.getAnalyticName());
         assertEquals("Test Operation name", AddAnalyticOperation.getOperationName());
         assertEquals("Test description", AddAnalyticOperation.getDescription());
         assertEquals(Collections.singletonList(USER), AddAnalyticOperation.getReadAccessRoles());
@@ -135,7 +135,7 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
         assertEquals(metaData, AddAnalyticOperation.getMetaData());
         assertEquals(outputType, AddAnalyticOperation.getOutputType());
         assertEquals(options, AddAnalyticOperation.getOptions());
-        assertEquals(4, (int)AddAnalyticOperation.getScore());
+        assertEquals(4, (int) AddAnalyticOperation.getScore());
     }
 
     @Override
@@ -147,13 +147,13 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
                 .userInputType("String")
                 .parameterName("finalMaxResultLimit")
                 .build());
-        uiMapping.put("uiMappingConstructorTest", new UIMappingDetail("Maximum Results","String", "finalMaxResultLimit") );
+        uiMapping.put("uiMappingConstructorTest", new UIMappingDetail("Maximum Results", "String", "finalMaxResultLimit"));
         Map<String, String> options = new HashMap<>();
-        options.put("option1","example Option");
+        options.put("option1", "example Option");
         Map<String, String> metaData = new HashMap<>();
         metaData.put("iconURL", "icon");
         Map<String, String> outputType = new HashMap<>();
-        outputType.put("output","table");
+        outputType.put("output", "table");
 
         AddAnalyticOperation AddAnalyticOperation = new AddAnalyticOperation.Builder()
                 .analyticName("Test Analytic name")
@@ -174,7 +174,7 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
 
         // Then
         assertNotSame(AddAnalyticOperation, clone);
-        assertEquals("Test Analytic name",clone.getAnalyticName());
+        assertEquals("Test Analytic name", clone.getAnalyticName());
         assertEquals("Test Operation name", clone.getOperationName());
         assertEquals("Test description", clone.getDescription());
         assertEquals(Collections.singletonList(USER), clone.getReadAccessRoles());
@@ -184,7 +184,7 @@ public class AddAnalyticOperationTest extends OperationTest<AddAnalyticOperation
         assertEquals(metaData, clone.getMetaData());
         assertEquals(outputType, clone.getOutputType());
         assertEquals(options, clone.getOptions());
-        assertEquals(4, (int)clone.getScore());
+        assertEquals(4, (int) clone.getScore());
     }
 
 
