@@ -73,7 +73,7 @@ public class UIMappingDetail implements Serializable {
         return inputClass;
     }
 
-    public void setInputClass(Class inputClass) {
+    public void setInputClass(final Class inputClass) {
         this.inputClass = inputClass;
     }
 

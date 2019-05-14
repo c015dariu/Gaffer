@@ -62,6 +62,7 @@ import uk.gov.gchq.koryphe.impl.predicate.IsLongerThan;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -485,7 +486,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
 
     @Override
     public AddAnalyticOperation AddAnalyticOperation() {
-        String USER = "User";
+        String user = "User";
         Map<String, UIMappingDetail> uiMapping = Maps.newHashMap();
         uiMapping.put("param1", new UIMappingDetail.Builder()
                 .label("Maximum Results")
@@ -495,21 +496,21 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         Map<String, String> metaData = new HashMap<>();
         metaData.put("iconURL", "location_off");
         Map<String, String> outputType = new HashMap<>();
-        outputType.put("output","table");
+        outputType.put("output", "table");
 
-        AddAnalyticOperation AddAnalyticOperation = new AddAnalyticOperation.Builder()
+        AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
                 .analyticName("Analytic1")
                 .operationName("Operation1")
                 .description("Description")
-                .readAccessRoles(USER)
-                .writeAccessRoles(USER)
+                .readAccessRoles(user)
+                .writeAccessRoles(user)
                 .overwrite(false)
                 .uiMapping(uiMapping)
                 .metaData(metaData)
                 .outputType(outputType)
                 .score(4)
                 .build();
-        return AddAnalyticOperation;
+        return addAnalyticOperation;
     }
 
     @Override

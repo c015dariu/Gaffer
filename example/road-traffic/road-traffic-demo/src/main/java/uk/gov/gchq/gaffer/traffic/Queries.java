@@ -307,7 +307,7 @@ public class Queries {
 
         try {
             System.out.println(new String(JSONSerialiser.serialise(results, true)));
-        } catch (SerialisationException e) {
+        } catch (final SerialisationException e) {
             e.printStackTrace();
         }
     }

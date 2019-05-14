@@ -30,7 +30,7 @@ import java.util.Map;
  * A {@link GetAnalyticOperation} is an {@link uk.gov.gchq.gaffer.operation.Operation}
  * for retrieving all {@link AnalyticOperationDetail}s associated with a Gaffer graph.
  */
-@JsonPropertyOrder(value = {"class","analyticName"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "analyticName"}, alphabetic = true)
 @Since("1.0.0")
 @Summary("Gets all available analytic operations")
 public class GetAnalyticOperation implements

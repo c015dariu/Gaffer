@@ -77,8 +77,8 @@ public class GetAllAnalyticOperationHandler implements OutputOperationHandler<Ge
             if (null != analyticOp) {
                 try {
                     NamedOperationDetail nod = new NamedOperationCache().getNamedOperation(analyticOp.getOperationName(), GetAllAnalyticOperationHandler.context.getUser());
-                    for (String currentParam : nod.getParameters().keySet()) {
-                        for (String uiKey : analyticOp.getUiMapping().keySet()) {
+                    for (final String currentParam : nod.getParameters().keySet()) {
+                        for (final String uiKey : analyticOp.getUiMapping().keySet()) {
                             UIMappingDetail uiParam = analyticOp.getUiMapping().get(uiKey);
                             if (uiParam.getParameterName().equals(currentParam)) {
                                 uiParam.setInputClass(nod.getParameters().get(currentParam).getValueClass());

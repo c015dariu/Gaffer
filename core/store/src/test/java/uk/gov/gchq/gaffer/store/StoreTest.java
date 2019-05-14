@@ -54,6 +54,10 @@ import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationChainDAO;
 import uk.gov.gchq.gaffer.operation.OperationException;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
+import uk.gov.gchq.gaffer.operation.analytic.GetAnalyticOperation;
 import uk.gov.gchq.gaffer.operation.impl.Count;
 import uk.gov.gchq.gaffer.operation.impl.CountGroups;
 import uk.gov.gchq.gaffer.operation.impl.DiscardOutput;
@@ -522,6 +526,12 @@ public class StoreTest {
                 GetAllNamedViews.class,
                 DeleteNamedView.class,
 
+                //Analytic Operations
+                AddAnalyticOperation.class,
+                GetAllAnalyticOperations.class,
+                DeleteAnalyticOperation.class,
+                GetAnalyticOperation.class,
+
                 // ElementComparison
                 Max.class,
                 Min.class,
@@ -630,6 +640,12 @@ public class StoreTest {
                 AddNamedView.class,
                 GetAllNamedViews.class,
                 DeleteNamedView.class,
+
+                //Analytic Operations
+                AddAnalyticOperation.class,
+                GetAllAnalyticOperations.class,
+                DeleteAnalyticOperation.class,
+                GetAnalyticOperation.class,
 
                 // ElementComparison
                 Max.class,
@@ -957,7 +973,7 @@ public class StoreTest {
     }
 
     private class StoreImpl extends Store {
-        private final Set<StoreTrait> TRAITS = new HashSet<>(Arrays.asList(INGEST_AGGREGATION, PRE_AGGREGATION_FILTERING, TRANSFORMATION, ORDERED));
+        private final Set<StoreTrait> traits = new HashSet<>(Arrays.asList(INGEST_AGGREGATION, PRE_AGGREGATION_FILTERING, TRANSFORMATION, ORDERED));
         private final ArrayList<Operation> doUnhandledOperationCalls = new ArrayList<>();
         private int createOperationHandlersCallCount;
         private final ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
@@ -969,7 +985,7 @@ public class StoreTest {
 
         @Override
         public Set<StoreTrait> getTraits() {
-            return TRAITS;
+            return traits;
         }
 
         public OperationHandler getOperationHandlerExposed(final Class<? extends Operation> opClass) {
@@ -1052,7 +1068,7 @@ public class StoreTest {
     // Second store implementation with overriding ExecutorService.
     // This cannot be done in the first because the other tests for Jobs will fail due to mocking.
     private class StoreImpl2 extends Store {
-        private final Set<StoreTrait> TRAITS = new HashSet<>(Arrays.asList(INGEST_AGGREGATION, PRE_AGGREGATION_FILTERING, TRANSFORMATION, ORDERED));
+        private final Set<StoreTrait> traits = new HashSet<>(Arrays.asList(INGEST_AGGREGATION, PRE_AGGREGATION_FILTERING, TRANSFORMATION, ORDERED));
         private final ArrayList<Operation> doUnhandledOperationCalls = new ArrayList<>();
         private int createOperationHandlersCallCount;
         private final ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
@@ -1064,7 +1080,7 @@ public class StoreTest {
 
         @Override
         public Set<StoreTrait> getTraits() {
-            return TRAITS;
+            return traits;
         }
 
         public OperationHandler getOperationHandlerExposed(final Class<? extends Operation> opClass) {
