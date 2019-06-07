@@ -18,7 +18,7 @@ package uk.gov.gchq.gaffer.rest.service.v2.example;
 
 import uk.gov.gchq.gaffer.named.view.AddNamedView;
 import uk.gov.gchq.gaffer.operation.Operation;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalytic;
 import uk.gov.gchq.gaffer.operation.impl.GetWalks;
 import uk.gov.gchq.gaffer.operation.impl.If;
 import uk.gov.gchq.gaffer.operation.impl.While;
@@ -40,11 +40,11 @@ import uk.gov.gchq.gaffer.operation.impl.output.ToMap;
 public interface ExamplesFactory {
 
     /**
-     * Generates an example for the {@link AddAnalyticOperation} operation.
+     * Generates an example for the {@link AddAnalytic} operation.
      *
      * @return the example class for AddAnalyticOperation
      */
-    AddAnalyticOperation AddAnalyticOperation();
+    AddAnalytic AddAnalyticOperation();
 
     /**
      * Generates an example for the {@link GetAdjacentIds} operation.

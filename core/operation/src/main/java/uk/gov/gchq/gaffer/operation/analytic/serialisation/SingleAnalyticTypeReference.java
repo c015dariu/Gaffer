@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Crown Copyright
+ * Copyright 2016-2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.gaffer.store.operation.handler.analytic;
+package uk.gov.gchq.gaffer.operation.analytic.serialisation;
 
-public class GetAllAnalyticOperationsHandlerTest {
+import com.fasterxml.jackson.core.type.TypeReference;
 
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticDetail;
+
+/**
+ * {@link TypeReference} objects for analytic operations.
+ */
+public final class SingleAnalyticTypeReference {
+    private SingleAnalyticTypeReference() {
+        // Private constructor to prevent instantiation.
+    }
+
+    public static class SingularAnalyticOperationDetail extends TypeReference<AnalyticDetail> {
+    }
 }

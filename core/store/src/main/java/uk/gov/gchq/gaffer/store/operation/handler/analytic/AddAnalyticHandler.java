@@ -19,25 +19,25 @@ package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 import uk.gov.gchq.gaffer.named.operation.NamedOperationDetail;
 import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
 import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalytic;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticDetail;
 import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OperationHandler;
-import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticCache;
 import uk.gov.gchq.gaffer.store.operation.handler.named.cache.NamedOperationCache;
 
 import java.util.Map;
 
-public class AddAnalyticOperationHandler implements OperationHandler<AddAnalyticOperation> {
-    private final AnalyticOperationCache cache;
+public class AddAnalyticHandler implements OperationHandler<AddAnalytic> {
+    private final AnalyticCache cache;
 
-    public AddAnalyticOperationHandler() {
-        this(new AnalyticOperationCache());
+    public AddAnalyticHandler() {
+        this(new AnalyticCache());
     }
 
-    public AddAnalyticOperationHandler(final AnalyticOperationCache cache) {
+    public AddAnalyticHandler(final AnalyticCache cache) {
         this.cache = cache;
     }
 
@@ -54,9 +54,9 @@ public class AddAnalyticOperationHandler implements OperationHandler<AddAnalytic
      * @throws OperationException if the operation on the cache fails
      */
     @Override
-    public Void doOperation(final AddAnalyticOperation operation, final Context context, final Store store) throws OperationException {
+    public Void doOperation(final AddAnalytic operation, final Context context, final Store store) throws OperationException {
         try {
-            final AnalyticOperationDetail analyticOperationDetail = new AnalyticOperationDetail.Builder()
+            final AnalyticDetail analyticOperationDetail = new AnalyticDetail.Builder()
                     .analyticName(operation.getAnalyticName())
                     .operationName(operation.getOperationName())
                     .creatorId(context.getUser().getUserId())
@@ -80,7 +80,7 @@ public class AddAnalyticOperationHandler implements OperationHandler<AddAnalytic
         return null;
     }
 
-    private void validate(final AnalyticOperationDetail analyticOperationDetail) throws OperationException {
+    private void validate(final AnalyticDetail analyticOperationDetail) throws OperationException {
 
         if (null != analyticOperationDetail.getUiMapping()) {
             Map<String, UIMappingDetail> uiMap = analyticOperationDetail.getUiMapping();

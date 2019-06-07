@@ -17,23 +17,23 @@ package uk.gov.gchq.gaffer.store.operation.handler.analytic;
 
 import uk.gov.gchq.gaffer.named.operation.cache.exception.CacheOperationFailedException;
 import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalytic;
 import uk.gov.gchq.gaffer.store.Context;
 import uk.gov.gchq.gaffer.store.Store;
 import uk.gov.gchq.gaffer.store.operation.handler.OperationHandler;
-import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticOperationCache;
+import uk.gov.gchq.gaffer.store.operation.handler.analytic.cache.AnalyticCache;
 
 /**
  * Operation Handler for DeleteAnalyticOperation.
  */
-public class DeleteAnalyticOperationHandler implements OperationHandler<DeleteAnalyticOperation> {
-    private final AnalyticOperationCache cache;
+public class DeleteAnalyticHandler implements OperationHandler<DeleteAnalytic> {
+    private final AnalyticCache cache;
 
-    public DeleteAnalyticOperationHandler() {
-        this(new AnalyticOperationCache());
+    public DeleteAnalyticHandler() {
+        this(new AnalyticCache());
     }
 
-    public DeleteAnalyticOperationHandler(final AnalyticOperationCache cache) {
+    public DeleteAnalyticHandler(final AnalyticCache cache) {
         this.cache = cache;
     }
 
@@ -49,7 +49,7 @@ public class DeleteAnalyticOperationHandler implements OperationHandler<DeleteAn
      * @throws OperationException thrown if the user doesn't have permission to delete the AnalyticOperation
      */
     @Override
-    public Void doOperation(final DeleteAnalyticOperation operation, final Context context, final Store store) throws OperationException {
+    public Void doOperation(final DeleteAnalytic operation, final Context context, final Store store) throws OperationException {
         try {
             cache.deleteAnalyticOperation(operation.getOperationName(), context.getUser(), store.getProperties().getAdminAuth());
         } catch (final CacheOperationFailedException e) {

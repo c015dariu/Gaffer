@@ -31,7 +31,7 @@ import uk.gov.gchq.gaffer.data.generator.MapGenerator;
 import uk.gov.gchq.gaffer.named.view.AddNamedView;
 import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalytic;
 import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.operation.data.EdgeSeed;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
@@ -109,7 +109,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         map.put(AddNamedView.class, addNamedView());
         map.put(If.class, ifOperation());
         map.put(While.class, whileOperation());
-        map.put(AddAnalyticOperation.class, AddAnalyticOperation());
+        map.put(AddAnalytic.class, AddAnalyticOperation());
 
         examplesMap = map;
     }
@@ -485,7 +485,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
     }
 
     @Override
-    public AddAnalyticOperation AddAnalyticOperation() {
+    public AddAnalytic AddAnalyticOperation() {
         String user = "User";
         Map<String, UIMappingDetail> uiMapping = Maps.newHashMap();
         uiMapping.put("param1", new UIMappingDetail.Builder()
@@ -498,7 +498,7 @@ public class DefaultExamplesFactory implements ExamplesFactory {
         Map<String, String> outputType = new HashMap<>();
         outputType.put("output", "table");
 
-        AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
+        AddAnalytic addAnalyticOperation = new AddAnalytic.Builder()
                 .analyticName("Analytic1")
                 .operationName("Operation1")
                 .description("Description")

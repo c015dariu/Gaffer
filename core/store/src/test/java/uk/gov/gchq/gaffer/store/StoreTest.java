@@ -54,10 +54,10 @@ import uk.gov.gchq.gaffer.operation.Operation;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationChainDAO;
 import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
-import uk.gov.gchq.gaffer.operation.analytic.GetAnalyticOperation;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalytic;
+import uk.gov.gchq.gaffer.operation.analytic.DeleteAnalytic;
+import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalytics;
+import uk.gov.gchq.gaffer.operation.analytic.GetAnalytic;
 import uk.gov.gchq.gaffer.operation.impl.Count;
 import uk.gov.gchq.gaffer.operation.impl.CountGroups;
 import uk.gov.gchq.gaffer.operation.impl.DiscardOutput;
@@ -527,10 +527,10 @@ public class StoreTest {
                 DeleteNamedView.class,
 
                 //Analytic Operations
-                AddAnalyticOperation.class,
-                GetAllAnalyticOperations.class,
-                DeleteAnalyticOperation.class,
-                GetAnalyticOperation.class,
+                AddAnalytic.class,
+                GetAllAnalytics.class,
+                DeleteAnalytic.class,
+                GetAnalytic.class,
 
                 // ElementComparison
                 Max.class,
@@ -642,10 +642,10 @@ public class StoreTest {
                 DeleteNamedView.class,
 
                 //Analytic Operations
-                AddAnalyticOperation.class,
-                GetAllAnalyticOperations.class,
-                DeleteAnalyticOperation.class,
-                GetAnalyticOperation.class,
+                AddAnalytic.class,
+                GetAllAnalytics.class,
+                DeleteAnalytic.class,
+                GetAnalytic.class,
 
                 // ElementComparison
                 Max.class,

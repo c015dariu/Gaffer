@@ -39,9 +39,9 @@ import uk.gov.gchq.gaffer.named.operation.NamedOperation;
 import uk.gov.gchq.gaffer.named.operation.ParameterDetail;
 import uk.gov.gchq.gaffer.operation.OperationChain;
 import uk.gov.gchq.gaffer.operation.OperationException;
-import uk.gov.gchq.gaffer.operation.analytic.AddAnalyticOperation;
-import uk.gov.gchq.gaffer.operation.analytic.AnalyticOperationDetail;
-import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalyticOperations;
+import uk.gov.gchq.gaffer.operation.analytic.AddAnalytic;
+import uk.gov.gchq.gaffer.operation.analytic.AnalyticDetail;
+import uk.gov.gchq.gaffer.operation.analytic.GetAllAnalytics;
 import uk.gov.gchq.gaffer.operation.analytic.UIMappingDetail;
 import uk.gov.gchq.gaffer.operation.data.EntitySeed;
 import uk.gov.gchq.gaffer.operation.graph.SeededGraphFilters;
@@ -290,10 +290,10 @@ public class Queries {
         final GetAllElements getElements = new GetAllElements.Builder()
                 .build();
 
-        final GetAllAnalyticOperations getAna = new GetAllAnalyticOperations.Builder()
+        final GetAllAnalytics getAna = new GetAllAnalytics.Builder()
                 .build();
 
-        final AddAnalyticOperation addAnalyticOperation = new AddAnalyticOperation.Builder()
+        final AddAnalytic addAnalyticOperation = new AddAnalytic.Builder()
                 .analyticName("analyticTest")
                 .operationName("frequent-vehicles-in-region")
                 .overwrite()
@@ -303,7 +303,7 @@ public class Queries {
                 .build();
 
         graph.execute(addAnalyticOperation, user);
-        CloseableIterable<? extends AnalyticOperationDetail> results = graph.execute(getAna, user);
+        CloseableIterable<? extends AnalyticDetail> results = graph.execute(getAna, user);
 
         try {
             System.out.println(new String(JSONSerialiser.serialise(results, true)));
