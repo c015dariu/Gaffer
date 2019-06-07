@@ -50,7 +50,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public class AnalyticOperationCacheIT {
+public class AnalyticCacheIT {
     private static final String CACHE_NAME = "AnalyticOperation";
     private final Properties cacheProps = new Properties();
     private final Store store = mock(Store.class);
